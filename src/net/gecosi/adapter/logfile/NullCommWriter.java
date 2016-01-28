@@ -3,8 +3,7 @@
  */
 package net.gecosi.adapter.logfile;
 
-import java.io.IOException;
-
+import jssc.SerialPortException;
 import net.gecosi.internal.CommWriter;
 import net.gecosi.internal.SiMessage;
 
@@ -16,6 +15,6 @@ import net.gecosi.internal.SiMessage;
 public class NullCommWriter implements CommWriter {
 
 	@Override
-	public void write(SiMessage message) throws IOException {}
+	public void write(SiMessage message) throws SerialPortException {}
 
 }

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.de.sportident;
+package de.sportident;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

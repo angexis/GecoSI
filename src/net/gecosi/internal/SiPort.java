@@ -3,10 +3,10 @@
  */
 package net.gecosi.internal;
 
-import gnu.io.UnsupportedCommOperationException;
-
 import java.io.IOException;
 import java.util.TooManyListenersException;
+
+import jssc.SerialPortException;
 
 /**
  * @author Simon Denier
@@ -15,14 +15,14 @@ import java.util.TooManyListenersException;
  */
 public interface SiPort {
 
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException;
+	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException;
 
 	public CommWriter createWriter() throws IOException;
 
-	public void setupHighSpeed() throws UnsupportedCommOperationException;
+	public void setupHighSpeed() throws SerialPortException;
 	
-	public void setupLowSpeed() throws UnsupportedCommOperationException;
+	public void setupLowSpeed() throws SerialPortException;
 
-	public void close();
+	public void close() throws SerialPortException;
 
 }

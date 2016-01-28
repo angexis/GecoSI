@@ -3,12 +3,11 @@
  */
 package net.gecosi.internal;
 
-import gnu.io.UnsupportedCommOperationException;
-
 import java.io.IOException;
 import java.util.TooManyListenersException;
 import java.util.concurrent.TimeoutException;
 
+import jssc.SerialPortException;
 import net.gecosi.CommStatus;
 import net.gecosi.SiHandler;
 
@@ -25,7 +24,7 @@ public class SiDriver implements Runnable {
 	private Thread thread;
 	private SiHandler siHandler;
 
-	public SiDriver(SiPort siPort, SiHandler siHandler) throws TooManyListenersException, IOException {
+	public SiDriver(SiPort siPort, SiHandler siHandler) throws TooManyListenersException, IOException, SerialPortException {
 		this.siPort = siPort;
 		this.messageQueue = siPort.createMessageQueue();
 		this.writer = siPort.createWriter();
@@ -58,7 +57,11 @@ public class SiDriver implements Runnable {
 			e.printStackTrace();
 			GecoSILogger.error(" #run# " + e.toString());
 		} finally {
-			stop();
+	            try {
+	                stop();
+	            } catch (SerialPortException e) {
+	                GecoSILogger.error(" #run# failed to stop" + e.toString());
+	            }
 		}
 	}
 
@@ -67,7 +70,7 @@ public class SiDriver implements Runnable {
 	}
 
 	private SiDriverState startupBootstrap()
-			throws UnsupportedCommOperationException, IOException, InterruptedException, InvalidMessage {
+			throws IOException, InterruptedException, InvalidMessage, SerialPortException {
 		try {
 			siHandler.notify(CommStatus.STARTING);
 			siPort.setupHighSpeed();
@@ -83,12 +86,12 @@ public class SiDriver implements Runnable {
 	}
 
 	private SiDriverState startup()
-			throws IOException, InterruptedException, TimeoutException, InvalidMessage {
+			throws IOException, InterruptedException, TimeoutException, InvalidMessage, SerialPortException {
 		SiDriverState currentState = SiDriverState.STARTUP.send(writer, siHandler).receive(messageQueue, writer, siHandler);
 		return currentState;
 	}
 
-	private void stop() {
+	private void stop() throws SerialPortException {
 		siPort.close();
 		siHandler.notify(CommStatus.OFF);
 		GecoSILogger.close();

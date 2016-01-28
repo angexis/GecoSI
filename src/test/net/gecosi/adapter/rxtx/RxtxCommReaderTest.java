@@ -1,18 +1,14 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.adapter.rxtx;
+package net.gecosi.adapter.rxtx;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import gnu.io.SerialPortEvent;
-import net.gecosi.adapter.rxtx.RxtxCommReader;
-import net.gecosi.internal.GecoSILogger;
-import net.gecosi.internal.SiMessage;
-import net.gecosi.internal.SiMessageQueue;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,14 +16,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortException;
+import net.gecosi.adapter.rxtx.RxtxCommReader;
+import net.gecosi.internal.GecoSILogger;
+import net.gecosi.internal.SiMessage;
+import net.gecosi.internal.SiMessageQueue;
+
 /**
  * @author Simon Denier
  * @since Jun 10, 2013
  *
  */
 public class RxtxCommReaderTest {
-	
-	private MockInputStream inputStream;
+        @Mock
+        private SerialPort serialPort;
 	
 	@Mock
 	private SiMessageQueue messageQueue;
@@ -39,21 +43,20 @@ public class RxtxCommReaderTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		GecoSILogger.open();
-		inputStream = new MockInputStream();
 	}
 	
 	public RxtxCommReader subject() {
-		return new RxtxCommReader(inputStream, messageQueue);
+		return new RxtxCommReader(serialPort, messageQueue);
 	}
 	
 	@Test
-	public void nomicalCase() {
+	public void nomicalCase() throws SerialPortException {
 		byte[] testInput = new byte[]{0x02, (byte) 0xF0, 0x03, 0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03};
 		testReaderOutput(new byte[][]{ testInput }, testInput, subject());
 	}
 
 	@Test
-	public void messageInTwoFragments() {
+	public void messageInTwoFragments() throws SerialPortException {
 		byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
 		byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03};
 		byte[] testOutput = new byte[]{0x02, (byte) 0xF0, 0x03, 0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03};
@@ -61,7 +64,7 @@ public class RxtxCommReaderTest {
 	}
 
 	@Test
-	public void messageInMultipleFragments() {
+	public void messageInMultipleFragments() throws SerialPortException {
 		byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
 		byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D};
 		byte[] testInput3 = new byte[]{0x11, 0x03};
@@ -70,7 +73,7 @@ public class RxtxCommReaderTest {
 	}
 	
 	@Test
-	public void firstFragmentWithoutLengthPrefix() {
+	public void firstFragmentWithoutLengthPrefix() throws SerialPortException {
 		byte[] testInput1 = new byte[]{0x02};
 		byte[] testInput2 = new byte[]{(byte) 0xF0, 0x03, 0x00, 0x01, 0x4D, 0x0D};
 		byte[] testInput3 = new byte[]{0x11, 0x03};
@@ -79,7 +82,7 @@ public class RxtxCommReaderTest {
 	}
 
 	@Test
-	public void zeroDataMessage() {
+	public void zeroDataMessage() throws SerialPortException {
 		byte[] testInput1 = new byte[]{0x02};
 		byte[] testInput2 = new byte[]{(byte) 0xF0, 0x00, (byte) 0xF0, 0x00, 0x03};
 		byte[] testOutput = new byte[]{0x02, (byte) 0xF0, 0x00, (byte) 0xF0, 0x00, 0x03};
@@ -87,30 +90,30 @@ public class RxtxCommReaderTest {
 	}
 	
 	@Test
-	public void emptyMessage() {
+	public void emptyMessage() throws SerialPortException {
 		RxtxCommReader subject = subject();
-		inputStream.setInput(new byte[0]);
+		when(serialPort.readBytes()).thenReturn(new byte[0]);
 		subject.serialEvent(triggerEvent);
 		verifyZeroInteractions(messageQueue);
 	}
 	
 	@Test
-	public void shortMessage() {
+	public void shortMessage() throws SerialPortException {
 		byte[] testInput = new byte[]{0x15};
 		testReaderOutput(new byte[][]{ testInput }, testInput, subject());
 	}
 	
 	@Test
-	public synchronized void timeoutResetsAccumulator() {
+	public synchronized void timeoutResetsAccumulator() throws SerialPortException {
 		try {
-			RxtxCommReader subject = new RxtxCommReader(inputStream, messageQueue, 1);
+			RxtxCommReader subject = new RxtxCommReader(serialPort, messageQueue, 1);
 			byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
-			inputStream.setInput(testInput1);
+		        when(serialPort.readBytes()).thenReturn(testInput1);
 			subject.serialEvent(triggerEvent);
 
 			wait(2);
 			byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03};
-			inputStream.setInput(testInput2);
+                        when(serialPort.readBytes()).thenReturn(testInput2);
 			subject.serialEvent(triggerEvent);
 		
 			verifyZeroInteractions(messageQueue);
@@ -124,14 +127,14 @@ public class RxtxCommReaderTest {
 	}
 
 	@Test
-	public synchronized void tooLongFragmentResetsAccumulator() {
-		RxtxCommReader subject = new RxtxCommReader(inputStream, messageQueue, 1);
+	public synchronized void tooLongFragmentResetsAccumulator() throws SerialPortException {
+		RxtxCommReader subject = new RxtxCommReader(serialPort, messageQueue, 1);
 		byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
-		inputStream.setInput(testInput1);
+                when(serialPort.readBytes()).thenReturn(testInput1);
 		subject.serialEvent(triggerEvent);
 
 		byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03, (byte) 0xFF};
-		inputStream.setInput(testInput2);
+                when(serialPort.readBytes()).thenReturn(testInput2);
 		subject.serialEvent(triggerEvent);
 		
 		verifyZeroInteractions(messageQueue);
@@ -145,10 +148,10 @@ public class RxtxCommReaderTest {
 		}
 	}
 	
-	private void testReaderOutput(byte[][] testInputs, byte[] expectedOutput, RxtxCommReader subject) {
+	private void testReaderOutput(byte[][] testInputs, byte[] expectedOutput, RxtxCommReader subject) throws SerialPortException {
 		try {
 			for (int i = 0; i < testInputs.length; i++) {
-				inputStream.setInput(testInputs[i]);
+	                        when(serialPort.readBytes()).thenReturn(testInputs[i]);
 				subject.serialEvent(triggerEvent);
 			}
 			ArgumentCaptor<SiMessage> message = ArgumentCaptor.forClass(SiMessage.class);

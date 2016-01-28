@@ -3,9 +3,8 @@
  */
 package net.gecosi.adapter.rxtx;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
+import jssc.SerialPort;
+import jssc.SerialPortException;
 import net.gecosi.internal.CommWriter;
 import net.gecosi.internal.GecoSILogger;
 import net.gecosi.internal.SiMessage;
@@ -17,15 +16,16 @@ import net.gecosi.internal.SiMessage;
  */
 public class RxtxCommWriter implements CommWriter {
 
-	private OutputStream output;
+	private SerialPort output;
 
-	public RxtxCommWriter(OutputStream out) {
-		this.output = out;
+	public RxtxCommWriter(SerialPort port) {
+		this.output = port;
 	}
 
-	public void write(SiMessage message) throws IOException {
+	@Override
+	public void write(SiMessage message) throws SerialPortException {
 		GecoSILogger.log("SEND", message.toString());
-		this.output.write(message.sequence());
+		this.output.writeBytes(message.sequence());
 	}
 
 }

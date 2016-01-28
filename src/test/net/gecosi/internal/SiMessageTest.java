@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.internal;
+package net.gecosi.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

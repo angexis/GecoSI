@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.internal;
+package net.gecosi.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
@@ -32,7 +32,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import test.net.gecosi.SiMessageFixtures;
+import net.gecosi.SiMessageFixtures;
 
 /**
  * @author Simon Denier

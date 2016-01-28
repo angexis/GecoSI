@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi;
+package net.gecosi;
 
 import static org.mockito.Mockito.verify;
 import net.gecosi.SiHandler;

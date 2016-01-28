@@ -1,4 +1,5 @@
 *.class
+*~
 *.log
 # Package Files #
 *.jar
@@ -7,3 +8,6 @@
 /archives
 /raw_output
 /bin/
+/build/
+/.settings/
+/.gradle/

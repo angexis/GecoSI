@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.adapter.rxtx;
+package net.gecosi.adapter.rxtx;
 
 import java.io.IOException;
 import java.io.InputStream;

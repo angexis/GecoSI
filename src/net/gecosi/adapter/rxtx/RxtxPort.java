@@ -3,12 +3,12 @@
  */
 package net.gecosi.adapter.rxtx;
 
-import gnu.io.SerialPort;
-import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.util.TooManyListenersException;
 
+import jssc.SerialPort;
+import jssc.SerialPortException;
 import net.gecosi.internal.CommWriter;
 import net.gecosi.internal.SiMessageQueue;
 import net.gecosi.internal.SiPort;
@@ -30,32 +30,37 @@ public class RxtxPort implements SiPort {
 		return port;
 	}
 	
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException {
-		SiMessageQueue messageQueue = new SiMessageQueue(10);
-		port.addEventListener(new RxtxCommReader(port.getInputStream(), messageQueue));
-		port.notifyOnDataAvailable(true);
-		return messageQueue;
-	}
+        @Override
+        public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException {
+                SiMessageQueue messageQueue = new SiMessageQueue(10);
+                port.addEventListener(new RxtxCommReader(port, messageQueue));
+//              port.notifyOnDataAvailable(true);
+                return messageQueue;
+        }
 	
+        @Override
 	public CommWriter createWriter() throws IOException {
-		return new RxtxCommWriter(port.getOutputStream());
+		return new RxtxCommWriter(port);
 	}
 
-	public void setupHighSpeed() throws UnsupportedCommOperationException {
+        @Override
+	public void setupHighSpeed() throws SerialPortException {
 		setSpeed(38400);		
 	}
 
-	public void setupLowSpeed() throws UnsupportedCommOperationException {
+        @Override
+	public void setupLowSpeed() throws SerialPortException {
 		setSpeed(4800);		
 	}
 
-	public void setSpeed(int baudRate) throws UnsupportedCommOperationException {
-		port.setSerialPortParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+	private void setSpeed(int baudRate) throws SerialPortException  {
+		port.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,  SerialPort.PARITY_NONE);
 	}
-
-	public void close() {
+        
+        @Override
+	public void close() throws SerialPortException {
 		// TODO: close streams?
-		port.close();
+		port.closePort();
 	}
 	
 }

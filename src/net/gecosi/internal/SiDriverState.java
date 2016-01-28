@@ -3,9 +3,9 @@
  */
 package net.gecosi.internal;
 
-import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import jssc.SerialPortException;
 import net.gecosi.CommStatus;
 import net.gecosi.SiHandler;
 import net.gecosi.dataframe.Si5DataFrame;
@@ -21,7 +21,7 @@ import net.gecosi.dataframe.SiDataFrame;
 public enum SiDriverState {
 	
 	STARTUP {
-		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 			writer.write(SiMessage.startup_sequence);
 			return STARTUP_CHECK;
 		}
@@ -29,7 +29,7 @@ public enum SiDriverState {
 
 	STARTUP_CHECK {
 		public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException, TimeoutException, InvalidMessage {
+				throws SerialPortException, InterruptedException, TimeoutException, InvalidMessage {
 			pollAnswer(queue, SiMessage.SET_MASTER_MODE);
 			return GET_CONFIG.send(writer, siHandler);
 		}
@@ -43,7 +43,7 @@ public enum SiDriverState {
 	},
 
 	GET_CONFIG {
-		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 			writer.write(SiMessage.get_protocol_configuration);
 			return CONFIG_CHECK;
 		}
@@ -51,7 +51,7 @@ public enum SiDriverState {
 
 	CONFIG_CHECK {
 		public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException, TimeoutException, InvalidMessage {
+				throws SerialPortException, InterruptedException, TimeoutException, InvalidMessage {
 			SiMessage message = pollAnswer(queue, SiMessage.GET_SYSTEM_VALUE);
 			byte cpcByte = message.sequence(6);
 			if( (cpcByte & CONFIG_CHECK_MASK) == CONFIG_CHECK_MASK ) {
@@ -80,7 +80,7 @@ public enum SiDriverState {
 	},
 	
 	GET_SI6_CARDBLOCKS {
-		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 			writer.write(SiMessage.get_cardblocks_configuration);
 			return SI6_CARDBLOCKS_SETTING;
 		}
@@ -88,7 +88,7 @@ public enum SiDriverState {
 
 	SI6_CARDBLOCKS_SETTING {
 		public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException, TimeoutException, InvalidMessage {
+				throws SerialPortException, InterruptedException, TimeoutException, InvalidMessage {
 			SiMessage message = pollAnswer(queue, SiMessage.GET_SYSTEM_VALUE);
 			si6_192PunchesMode = (message.sequence(6) & 0xFF) == 0xFF;
 			GecoSILogger.info("SiCard6 192 Punches Mode " + (si6_192PunchesMode ? "Enabled" : "Disabled"));
@@ -97,7 +97,7 @@ public enum SiDriverState {
 	},
 
 	STARTUP_COMPLETE {
-		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 			writer.write(SiMessage.beep_twice);
 			siHandler.notify(CommStatus.ON);
 			return DISPATCH_READY;
@@ -106,7 +106,7 @@ public enum SiDriverState {
 	
 	DISPATCH_READY {
 		public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			siHandler.notify(CommStatus.READY);
 			SiMessage message = queue.take();
 			siHandler.notify(CommStatus.PROCESSING);
@@ -129,7 +129,7 @@ public enum SiDriverState {
 		}
 
 		private SiDriverState dispatchSicard8Plus(SiMessage message, SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			if( message.sequence(SiMessage.SI3_NUMBER_INDEX) == SiMessage.SI_CARD_10_PLUS_SERIES ) {
 				return RETRIEVE_SICARD_10_PLUS_DATA.retrieve(queue, writer, siHandler);
 			} else {
@@ -140,7 +140,7 @@ public enum SiDriverState {
 	
 	RETRIEVE_SICARD_5_DATA {
 		public SiDriverState retrieve(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			return retrieveDataMessages(queue, writer, siHandler, new SiMessage[]{ SiMessage.read_sicard_5 }, -1,
 										"Timeout on retrieving SiCard 5 data");
 		}
@@ -162,7 +162,7 @@ public enum SiDriverState {
 		};
 
 		public SiDriverState retrieve(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			final int nbPunchesIndex = Si6DataFrame.NB_PUNCHES_INDEX + 6;
 			return retrieveDataMessages(queue, writer, siHandler, readoutCommands, nbPunchesIndex,
 										"Timeout on retrieving SiCard 6 data");
@@ -176,7 +176,7 @@ public enum SiDriverState {
 
 	RETRIEVE_SICARD_8_9_DATA {
 		public SiDriverState retrieve(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			return retrieveDataMessages(queue, writer, siHandler,
 					new SiMessage[] { SiMessage.read_sicard_8_plus_b0, SiMessage.read_sicard_8_plus_b1 },
 					-1, "Timeout on retrieving SiCard 8/9 data");
@@ -198,7 +198,7 @@ public enum SiDriverState {
 		};
 
 		public SiDriverState retrieve(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			final int nbPunchesIndex = Si8PlusDataFrame.NB_PUNCHES_INDEX + 6;
 			return retrieveDataMessages(queue, writer, siHandler, readoutCommands, nbPunchesIndex,
 										"Timeout on retrieving SiCard 10/11/SIAC data");
@@ -211,7 +211,7 @@ public enum SiDriverState {
 	},
 
 	ACK_READ {
-		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+		public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 			writer.write(SiMessage.ack_sequence);
 			return WAIT_SICARD_REMOVAL;
 		}		
@@ -219,7 +219,7 @@ public enum SiDriverState {
 	
 	WAIT_SICARD_REMOVAL {
 		public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-				throws IOException, InterruptedException {
+				throws SerialPortException, InterruptedException {
 			try {
 				pollAnswer(queue, SiMessage.SI_CARD_REMOVED);
 				return DISPATCH_READY;
@@ -248,19 +248,19 @@ public enum SiDriverState {
 		si6_192PunchesMode = flag;
 	}
 	
-	public SiDriverState send(CommWriter writer, SiHandler siHandler) throws IOException {
+	public SiDriverState send(CommWriter writer, SiHandler siHandler) throws SerialPortException {
 		wrongCall();
 		return this;
 	}
 
 	public SiDriverState receive(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-			throws IOException, InterruptedException, TimeoutException, InvalidMessage {
+			throws SerialPortException, InterruptedException, TimeoutException, InvalidMessage {
 		wrongCall();
 		return this;
 	}
 
 	public SiDriverState retrieve(SiMessageQueue queue, CommWriter writer, SiHandler siHandler)
-			throws IOException, InterruptedException {
+			throws SerialPortException, InterruptedException {
 		wrongCall();
 		return this;
 	}
@@ -304,7 +304,7 @@ public enum SiDriverState {
 	}
 
 	protected SiDriverState retrieveDataMessages(SiMessageQueue queue, CommWriter writer, SiHandler siHandler,
-			SiMessage[] readoutCommands, int nbPunchesIndex, String timeoutMessage) throws IOException, InterruptedException {
+			SiMessage[] readoutCommands, int nbPunchesIndex, String timeoutMessage) throws SerialPortException, InterruptedException {
 		try {
 			GecoSILogger.stateChanged(name());
 			SiMessage readoutCommand = readoutCommands[0];

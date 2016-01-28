@@ -1,14 +1,13 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.internal;
-
-import gnu.io.UnsupportedCommOperationException;
+package net.gecosi.internal;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.TooManyListenersException;
 
+import jssc.SerialPortException;
 import net.gecosi.internal.CommWriter;
 import net.gecosi.internal.SiMessage;
 import net.gecosi.internal.SiMessageQueue;
@@ -48,12 +47,12 @@ public class MockCommPort implements SiPort {
 	}
 
 	public class MockComm implements CommWriter {
-		public void write(SiMessage message) throws IOException {}
+		public void write(SiMessage message) throws SerialPortException {}
 	}
 
-	public void setupHighSpeed() throws UnsupportedCommOperationException {}
+	public void setupHighSpeed() {}
 
-	public void setupLowSpeed() throws UnsupportedCommOperationException {}
+	public void setupLowSpeed() {}
 
 	public void close() {
 		// TODO test always closed/called

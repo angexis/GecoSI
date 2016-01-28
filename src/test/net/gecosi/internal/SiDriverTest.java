@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.internal;
+package net.gecosi.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -10,23 +10,23 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
-import static test.net.gecosi.SiMessageFixtures.no_ext_protocol_answer;
-import static test.net.gecosi.SiMessageFixtures.ok_ext_protocol_answer;
-import static test.net.gecosi.SiMessageFixtures.si6_192_punches_answer;
-import static test.net.gecosi.SiMessageFixtures.si6_64_punches_answer;
-import static test.net.gecosi.SiMessageFixtures.sicard10_b0_data;
-import static test.net.gecosi.SiMessageFixtures.sicard10_b4_data;
-import static test.net.gecosi.SiMessageFixtures.sicard10_detected;
-import static test.net.gecosi.SiMessageFixtures.sicard5_data;
-import static test.net.gecosi.SiMessageFixtures.sicard5_detected;
-import static test.net.gecosi.SiMessageFixtures.sicard5_removed;
-import static test.net.gecosi.SiMessageFixtures.sicard6_192p_b0_data;
-import static test.net.gecosi.SiMessageFixtures.sicard6_192p_b2_data;
-import static test.net.gecosi.SiMessageFixtures.sicard6_192p_b3_data;
-import static test.net.gecosi.SiMessageFixtures.sicard6_192p_b6_data;
-import static test.net.gecosi.SiMessageFixtures.sicard6_192p_b7_data;
-import static test.net.gecosi.SiMessageFixtures.sicard6_detected;
-import static test.net.gecosi.SiMessageFixtures.startup_answer;
+import static net.gecosi.SiMessageFixtures.no_ext_protocol_answer;
+import static net.gecosi.SiMessageFixtures.ok_ext_protocol_answer;
+import static net.gecosi.SiMessageFixtures.si6_192_punches_answer;
+import static net.gecosi.SiMessageFixtures.si6_64_punches_answer;
+import static net.gecosi.SiMessageFixtures.sicard10_b0_data;
+import static net.gecosi.SiMessageFixtures.sicard10_b4_data;
+import static net.gecosi.SiMessageFixtures.sicard10_detected;
+import static net.gecosi.SiMessageFixtures.sicard5_data;
+import static net.gecosi.SiMessageFixtures.sicard5_detected;
+import static net.gecosi.SiMessageFixtures.sicard5_removed;
+import static net.gecosi.SiMessageFixtures.sicard6_192p_b0_data;
+import static net.gecosi.SiMessageFixtures.sicard6_192p_b2_data;
+import static net.gecosi.SiMessageFixtures.sicard6_192p_b3_data;
+import static net.gecosi.SiMessageFixtures.sicard6_192p_b6_data;
+import static net.gecosi.SiMessageFixtures.sicard6_192p_b7_data;
+import static net.gecosi.SiMessageFixtures.sicard6_detected;
+import static net.gecosi.SiMessageFixtures.startup_answer;
 import net.gecosi.CommStatus;
 import net.gecosi.SiHandler;
 import net.gecosi.dataframe.Si5DataFrame;

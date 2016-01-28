@@ -3,13 +3,13 @@
  */
 package net.gecosi.adapter.rxtx;
 
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 import net.gecosi.internal.GecoSILogger;
 import net.gecosi.internal.SiMessage;
 import net.gecosi.internal.SiMessageQueue;
@@ -25,7 +25,7 @@ public class RxtxCommReader implements SerialPortEventListener {
 
 	private static final int METADATA_SIZE = 6;
 	
-	private InputStream input;
+	private SerialPort input;
 
 	private SiMessageQueue messageQueue;
 
@@ -38,18 +38,18 @@ public class RxtxCommReader implements SerialPortEventListener {
 	private int timeoutDelay;
 	
 
-	public RxtxCommReader(InputStream input, SiMessageQueue messageQueue) {
+	public RxtxCommReader(SerialPort input, SiMessageQueue messageQueue) {
 		this(input, messageQueue, 500);
 	}
 
-	public RxtxCommReader(InputStream input, SiMessageQueue messageQueue, int timeout) {
+	public RxtxCommReader(SerialPort input, SiMessageQueue messageQueue, int timeout) {
 		this.input = input;
 		this.messageQueue = messageQueue;
 		this.timeoutDelay = timeout;
 		this.lastTime = 0;
 	}
 
-	public void serialEvent(SerialPortEvent event) {
+        public void serialEvent(SerialPortEvent event) {
 		try {
 			checkTimeout();
 			accumulate();
@@ -69,9 +69,15 @@ public class RxtxCommReader implements SerialPortEventListener {
 		accSize = 0;
 	}
 
-	private void accumulate() throws IOException {
-		accSize += this.input.read(accumulator, accSize, MAX_MESSAGE_SIZE - accSize);
-	}
+        private void accumulate() throws IOException, SerialPortException {
+            byte[] readBytes = this.input.readBytes();
+            for (byte b : readBytes) {
+                if ( accSize >= MAX_MESSAGE_SIZE) {
+                    throw new RuntimeException("Buffer overlow");
+                }
+                accumulator[accSize++] = b;
+            }
+        }
 	
 	private void checkTimeout() {
 		long currentTime = System.currentTimeMillis();

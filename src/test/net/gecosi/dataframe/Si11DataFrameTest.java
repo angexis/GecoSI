@@ -1,15 +1,15 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.dataframe;
+package net.gecosi.dataframe;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static test.net.gecosi.SiMessageFixtures.sicard11_b0_data;
-import static test.net.gecosi.SiMessageFixtures.sicard11_b4_data;
-import static test.net.gecosi.SiMessageFixtures.sicard11_b5_data;
-import static test.net.gecosi.SiMessageFixtures.sicard11_b6_data;
-import static test.net.gecosi.SiMessageFixtures.sicard11_b7_data;
+import static net.gecosi.SiMessageFixtures.sicard11_b0_data;
+import static net.gecosi.SiMessageFixtures.sicard11_b4_data;
+import static net.gecosi.SiMessageFixtures.sicard11_b5_data;
+import static net.gecosi.SiMessageFixtures.sicard11_b6_data;
+import static net.gecosi.SiMessageFixtures.sicard11_b7_data;
 import net.gecosi.dataframe.Si8PlusDataFrame;
 import net.gecosi.dataframe.SiDataFrame;
 import net.gecosi.dataframe.SiPunch;

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2013 Simon Denier
  */
-package test.net.gecosi.dataframe;
+package net.gecosi.dataframe;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -12,7 +12,7 @@ import net.gecosi.internal.SiMessage;
 
 import org.junit.Test;
 
-import test.net.gecosi.SiMessageFixtures;
+import net.gecosi.SiMessageFixtures;
 
 /**
  * @author Simon Denier
