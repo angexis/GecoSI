@@ -18,6 +18,12 @@ Thanks to Yannis Guedel, there is a port of [GecoSI](https://github.com/yannisgu
 Changelog
 =========
 
+version... 2.x ?
+----------------
+ - Switched from RxTx to jSSC which makes my first tests pass under Linux-x86_64
+ - Changed packaging to adapt to a flat jar used by another project I am working on (still unnamed) - hence the jSSC that must be added in the dependencies for now, because GecoSI is not yet an artifact with transitive dependencies
+ - Switched to Gradle which manages the dependencies for us
+
 v1.2.0
 ------
 
@@ -40,9 +46,10 @@ v1.0.0
 
 Build Target
 ============
+Without any prior installation (Gradle will be downloaded as part of the first build):
 
 ```
-  ant build_jar
+$ ./gradlew jar
 ```
 
 Usage (Library)

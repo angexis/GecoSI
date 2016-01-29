@@ -1,10 +1,9 @@
 *.class
 *~
 *.log
+.project
+.classpath
 # Package Files #
-*.jar
-*.war
-*.ear
 /archives
 /raw_output
 /bin/
