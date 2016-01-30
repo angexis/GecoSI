@@ -21,7 +21,7 @@ Changelog
 version... 2.x ?
 ----------------
  - Switched from RxTx to jSSC which makes my first tests pass under Linux-x86_64
- - Changed packaging to adapt to a flat jar used by another project I am working on (still unnamed) - hence the jSSC that must be added in the dependencies for now, because GecoSI is not yet an artifact with transitive dependencies
+ - Changed packaging to adopt Maven artifact (with transitive depencencies) - goal is to adapt to a flat-jar (rather than one-jar which uses nested jars) used by another project I am working on (still unnamed)
  - Switched to Gradle which manages the dependencies for us
 
 v1.2.0
@@ -49,7 +49,17 @@ Build Target
 Without any prior installation (Gradle will be downloaded as part of the first build):
 
 ```
-$ ./gradlew jar
+$ ./gradlew test jar
+```
+
+Or, if you want to re-use the generated output in another Gradle project:
+```
+$ ./gradlew test publishMyPublicationToWorkspaceRepository
+```
+which will publish the jar (and the information about its transitive dependency) into a local maven repo stored in ../.m2workspace (wich is located at your workspace level so that we do not mix those dependencies with another
+workspace possibly in another branch). It can also be typed as:
+```
+$ ./gradlew test pMPTW
 ```
 
 Usage (Library)
@@ -62,7 +72,7 @@ Usage (Library)
 
 Usage (CLI)
 ===========
-
+**TODO**: restore CLI? is it used at all outside of GecoSI developers who now how to start their Java class?
 - `SiHandler` can be run from the command line with `java net.gecosi.SiHandler`
 - It provides a simple handler which prints events, status, and sicard data as they are read
 - It takes as a parameter the serial port to connect to

@@ -1,45 +1,70 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
+group = 'net.geco'
 version = '2.0.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+ext {
+	// when building GecoSI, it will be deployed to this folder so
+	// than another Maven/Gradle build can use it directly
+	// if it sets up a local maven repo folder just as this build file
+	// is doing (check references to ${m2workspace}
+	m2workspace = "$projectDir/../.m2workspace"
 }
 
-dependencies {
-    compile 'org.scream3r:jssc:2.8.0'
-    testCompile 'org.mockito:mockito-all:1.9.5'
-    testCompile 'junit:junit:4.12'
+repositories {
+	maven {
+		url "${m2workspace}"
+	}
+	mavenCentral()
 }
+dependencies {
+	compile 'org.scream3r:jssc:2.8.0'
+	testCompile 'org.mockito:mockito-all:1.9.5'
+	testCompile 'junit:junit:4.12'
+}
+// keep the original file structure so that future merges will be easier
 sourceSets {
-    main {
-      java {
-        srcDir 'src'
-        exclude 'test/**'
-      }
-    }
-    test {
-      java {
-        srcDir 'src/test'
-      }
-    }
+	main {
+		java {
+		srcDir 'src'
+		exclude 'test/**'
+	  }
+	}
+	test {
+		java {
+		srcDir 'src/test'
+	  }
+	}
 }
 
 jar {
-    manifest {
-        attributes 'Implementation-Title': project.name,
-                   'Implementation-Version': project.version
-    }
+	manifest {
+		attributes  'Implementation-Title': project.name,
+					'Implementation-Version': project.version
+	}
 }
 
 eclipse {
-    classpath {
-       downloadSources=true
-       downloadJavadoc=true
-    }
+	classpath {
+		downloadSources=true
+		downloadJavadoc=true
+	}
 }
-
+publishing {
+	repositories {
+		maven {
+			name 'Workspace'
+			url "${m2workspace}"
+		}
+	}
+	publications {
+		my(MavenPublication) {
+			from components.java
+		}
+	}
+}
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+	gradleVersion = '2.10'
 }

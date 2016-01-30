@@ -30,13 +30,12 @@ public class RxtxPort implements SiPort {
 		return port;
 	}
 	
-        @Override
-        public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException {
-                SiMessageQueue messageQueue = new SiMessageQueue(10);
-                port.addEventListener(new RxtxCommReader(port, messageQueue));
-//              port.notifyOnDataAvailable(true);
-                return messageQueue;
-        }
+	@Override
+	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException {
+		SiMessageQueue messageQueue = new SiMessageQueue(10);
+		port.addEventListener(new RxtxCommReader(port, messageQueue));
+		return messageQueue;
+	}
 	
         @Override
 	public CommWriter createWriter() throws IOException {

@@ -30,9 +30,9 @@ import net.gecosi.internal.SiMessageQueue;
  *
  */
 public class RxtxCommReaderTest {
-        @Mock
-        private SerialPort serialPort;
-	
+	@Mock
+	private SerialPort serialPort;
+
 	@Mock
 	private SiMessageQueue messageQueue;
 
@@ -108,12 +108,12 @@ public class RxtxCommReaderTest {
 		try {
 			RxtxCommReader subject = new RxtxCommReader(serialPort, messageQueue, 1);
 			byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
-		        when(serialPort.readBytes()).thenReturn(testInput1);
+			when(serialPort.readBytes()).thenReturn(testInput1);
 			subject.serialEvent(triggerEvent);
 
 			wait(2);
 			byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03};
-                        when(serialPort.readBytes()).thenReturn(testInput2);
+			when(serialPort.readBytes()).thenReturn(testInput2);
 			subject.serialEvent(triggerEvent);
 		
 			verifyZeroInteractions(messageQueue);
@@ -130,11 +130,11 @@ public class RxtxCommReaderTest {
 	public synchronized void tooLongFragmentResetsAccumulator() throws SerialPortException {
 		RxtxCommReader subject = new RxtxCommReader(serialPort, messageQueue, 1);
 		byte[] testInput1 = new byte[]{0x02, (byte) 0xF0, 0x03};
-                when(serialPort.readBytes()).thenReturn(testInput1);
+		when(serialPort.readBytes()).thenReturn(testInput1);
 		subject.serialEvent(triggerEvent);
 
 		byte[] testInput2 = new byte[]{0x00, 0x01, 0x4D, 0x0D, 0x11, 0x03, (byte) 0xFF};
-                when(serialPort.readBytes()).thenReturn(testInput2);
+		when(serialPort.readBytes()).thenReturn(testInput2);
 		subject.serialEvent(triggerEvent);
 		
 		verifyZeroInteractions(messageQueue);
@@ -151,7 +151,7 @@ public class RxtxCommReaderTest {
 	private void testReaderOutput(byte[][] testInputs, byte[] expectedOutput, RxtxCommReader subject) throws SerialPortException {
 		try {
 			for (int i = 0; i < testInputs.length; i++) {
-	                        when(serialPort.readBytes()).thenReturn(testInputs[i]);
+				when(serialPort.readBytes()).thenReturn(testInputs[i]);
 				subject.serialEvent(triggerEvent);
 			}
 			ArgumentCaptor<SiMessage> message = ArgumentCaptor.forClass(SiMessage.class);

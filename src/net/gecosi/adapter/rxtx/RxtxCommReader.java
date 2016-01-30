@@ -69,15 +69,15 @@ public class RxtxCommReader implements SerialPortEventListener {
 		accSize = 0;
 	}
 
-        private void accumulate() throws IOException, SerialPortException {
-            byte[] readBytes = this.input.readBytes();
-            for (byte b : readBytes) {
-                if ( accSize >= MAX_MESSAGE_SIZE) {
-                    throw new RuntimeException("Buffer overlow");
-                }
-                accumulator[accSize++] = b;
-            }
-        }
+	private void accumulate() throws IOException, SerialPortException {
+		byte[] readBytes = this.input.readBytes();
+		for (byte b : readBytes) {
+			if (accSize >= MAX_MESSAGE_SIZE) {
+				throw new RuntimeException("Buffer overlow");
+			}
+			accumulator[accSize++] = b;
+		}
+	}
 	
 	private void checkTimeout() {
 		long currentTime = System.currentTimeMillis();

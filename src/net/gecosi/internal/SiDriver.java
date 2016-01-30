@@ -57,11 +57,11 @@ public class SiDriver implements Runnable {
 			e.printStackTrace();
 			GecoSILogger.error(" #run# " + e.toString());
 		} finally {
-	            try {
-	                stop();
-	            } catch (SerialPortException e) {
-	                GecoSILogger.error(" #run# failed to stop" + e.toString());
-	            }
+			try {
+				stop();
+			} catch (SerialPortException e) {
+				GecoSILogger.error(" #run# failed to stop" + e.toString());
+			}
 		}
 	}
 

@@ -4,11 +4,13 @@
 package net.gecosi;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 import net.gecosi.adapter.logfile.LogFilePort;
 import net.gecosi.adapter.rxtx.RxtxPort;
 import net.gecosi.dataframe.SiDataFrame;
@@ -38,29 +40,33 @@ public class SiHandler implements Runnable {
 		this.siListener = siListener;
 	}
 
+	/**
+	 * Returns the name of all the detected ports. Notice that the ports are
+	 * just detected to have any device plugged, it is not necessarily a
+	 * SportIdent device (and it may already be busy).
+	 * 
+	 * @return ["/dev/tty0"] or ["COM3", "COM8"]
+	 */
+	public static String[] getPortNames() {
+		return SerialPortList.getPortNames();
+	}
+
 	public void setZeroHour(long zerohour) {
 		this.zerohour = zerohour;
 	}
 
-        public void connect(String portname) throws IOException, SerialPortException, TooManyListenersException {
-//          try {
-                SerialPort port = new SerialPort(portname);
-//                  if( portId.isCurrentlyOwned() ) {
-//                          siListener.notify(CommStatus.FATAL_ERROR, "Port owned by other app");
-//                  } else {
-                            GecoSILogger.open("######");
-                            GecoSILogger.logTime("Start " + portname);
-                            start();
-                            port.openPort();
-//                          SerialPort port = (SerialPort) portId.open("GecoSI", 2000);
-                            driver = new SiDriver(new RxtxPort(port), this).start();
-//                  }
-//          } catch (NoSuchPortException e) {
-//                  siListener.notify(CommStatus.FATAL_ERROR, "Port unknowned");
-//          } catch (PortInUseException e) {
-//                  siListener.notify(CommStatus.FATAL_ERROR, "Port in use");
-//          }
-    }
+	public void connect(String portname) throws IOException, SerialPortException, TooManyListenersException {
+		try {
+			SerialPort port = new SerialPort(portname);
+			GecoSILogger.open("######");
+			GecoSILogger.logTime("Start " + portname);
+			start();
+			port.openPort();
+			driver = new SiDriver(new RxtxPort(port), this).start();
+		} catch (SerialPortException e) {
+			siListener.notify(CommStatus.FATAL_ERROR, e.getExceptionType());
+		}
+	}
 	public void readLog(String logFilename) throws IOException, SerialPortException {
 		try {
 			GecoSILogger.openOutStreamLogger();
@@ -130,11 +136,16 @@ public class SiHandler implements Runnable {
 				System.out.println("Status -> " + status);
 			}
 			public void notify(CommStatus errorStatus, String errorMessage) {
-				System.out.println("Error -> " + errorStatus + " " + errorMessage);
+				System.out.println("Error -> " + errorStatus + ": " + errorMessage);
+				if (errorStatus == CommStatus.FATAL_ERROR) {
+					System.exit(1);
+				}
 			}
 		});
 
 		if( args.length == 1 ){
+			System.out.println("Found ports: " + Arrays.toString(getPortNames()));
+
 			try {
 				handler.connect(args[0]);
 			} catch (Exception e) {
