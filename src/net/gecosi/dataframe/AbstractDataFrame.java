@@ -3,6 +3,7 @@
  */
 package net.gecosi.dataframe;
 
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -70,16 +71,22 @@ public abstract class AbstractDataFrame implements SiDataFrame {
 		}
 	}
 
-	public void printString() {
-		System.out.format("%s: %s ", getSiSeries(), getSiNumber());
-		System.out.format("(Start: %s ", formatTime(getStartTime()));
-		System.out.format(" - Finish: %s", formatTime(getFinishTime()));
-		System.out.format(" - Check: %s)%n", formatTime(getCheckTime()));
-		System.out.format("Punches: %s %n", getNbPunches());
+	@Override
+	public void printString(PrintStream out) {
+		out.format("%s: %s ", getSiSeries(), getSiNumber());
+		out.format("(Start: %s ", formatTime(getStartTime()));
+		out.format(" - Finish: %s", formatTime(getFinishTime()));
+		out.format(" - Check: %s)%n", formatTime(getCheckTime()));
+		out.format("Punches: %s %n", getNbPunches());
 		for (int i = 0; i < getNbPunches(); i++) {
-			System.out.format("%s: %s %s - ", i, getPunches()[i].code(), formatTime(getPunches()[i].timestamp()));
+			out.format("%s: %s %s - ", i, getPunches()[i].code(), formatTime(getPunches()[i].timestamp()));
 		}
-		System.out.println();
+		out.println();
+		
 	}
-	
+
+	@Override
+	public void printString() {
+		printString(System.out);
+	}
 }

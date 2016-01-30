@@ -3,6 +3,7 @@
  */
 package net.gecosi.dataframe;
 
+import java.io.PrintStream;
 
 /**
  * @author Simon Denier
@@ -30,5 +31,7 @@ public interface SiDataFrame {
 	public SiPunch[] getPunches();
 
 	public void printString();
+
+	void printString(PrintStream out);
 
 }
