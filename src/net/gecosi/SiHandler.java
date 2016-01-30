@@ -5,7 +5,6 @@ package net.gecosi;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.TooManyListenersException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import jssc.SerialPort;
@@ -47,7 +46,7 @@ public class SiHandler implements Runnable {
 	 * 
 	 * @return ["/dev/tty0"] or ["COM3", "COM8"]
 	 */
-	public static String[] getPortNames() {
+	public static String[] listPortNames() {
 		return SerialPortList.getPortNames();
 	}
 
@@ -55,7 +54,7 @@ public class SiHandler implements Runnable {
 		this.zerohour = zerohour;
 	}
 
-	public void connect(String portname) throws IOException, SerialPortException, TooManyListenersException {
+	public void connect(String portname) {
 		try {
 			SerialPort port = new SerialPort(portname);
 			GecoSILogger.open("######");
@@ -66,15 +65,14 @@ public class SiHandler implements Runnable {
 		} catch (SerialPortException e) {
 			siListener.notify(CommStatus.FATAL_ERROR, e.getExceptionType());
 		}
+		catch (IOException e) {
+			siListener.notify(CommStatus.FATAL_ERROR, e.toString());
+		}
 	}
 	public void readLog(String logFilename) throws IOException, SerialPortException {
-		try {
-			GecoSILogger.openOutStreamLogger();
-			start();
-			driver = new SiDriver(new LogFilePort(logFilename), this).start();
-		} catch (TooManyListenersException e) {
-			e.printStackTrace();
-		}
+		GecoSILogger.openOutStreamLogger();
+		start();
+		driver = new SiDriver(new LogFilePort(logFilename), this).start();
 	}
 
 	public void start() {
@@ -144,7 +142,7 @@ public class SiHandler implements Runnable {
 		});
 
 		if( args.length == 1 ){
-			System.out.println("Found ports: " + Arrays.toString(getPortNames()));
+			System.out.println("Found ports: " + Arrays.toString(listPortNames()));
 
 			try {
 				handler.connect(args[0]);

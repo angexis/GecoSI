@@ -5,13 +5,8 @@ package net.gecosi.internal;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.TooManyListenersException;
 
 import jssc.SerialPortException;
-import net.gecosi.internal.CommWriter;
-import net.gecosi.internal.SiMessage;
-import net.gecosi.internal.SiMessageQueue;
-import net.gecosi.internal.SiPort;
 
 /**
  * @author Simon Denier
@@ -38,7 +33,7 @@ public class MockCommPort implements SiPort {
 		
 	}
 
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException {
+	public SiMessageQueue createMessageQueue() throws IOException {
 		return messageQueue;
 	}
 

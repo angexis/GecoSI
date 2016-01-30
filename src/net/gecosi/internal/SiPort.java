@@ -4,7 +4,6 @@
 package net.gecosi.internal;
 
 import java.io.IOException;
-import java.util.TooManyListenersException;
 
 import jssc.SerialPortException;
 
@@ -15,7 +14,7 @@ import jssc.SerialPortException;
  */
 public interface SiPort {
 
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException;
+	public SiMessageQueue createMessageQueue() throws IOException, SerialPortException;
 
 	public CommWriter createWriter() throws IOException;
 

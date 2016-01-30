@@ -5,7 +5,6 @@ package net.gecosi.adapter.rxtx;
 
 
 import java.io.IOException;
-import java.util.TooManyListenersException;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -31,7 +30,7 @@ public class RxtxPort implements SiPort {
 	}
 	
 	@Override
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException, SerialPortException {
+	public SiMessageQueue createMessageQueue() throws IOException, SerialPortException {
 		SiMessageQueue messageQueue = new SiMessageQueue(10);
 		port.addEventListener(new RxtxCommReader(port, messageQueue));
 		return messageQueue;

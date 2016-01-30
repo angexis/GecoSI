@@ -4,7 +4,6 @@
 package net.gecosi.adapter.logfile;
 
 import java.io.IOException;
-import java.util.TooManyListenersException;
 
 import net.gecosi.internal.CommWriter;
 import net.gecosi.internal.SiMessageQueue;
@@ -24,7 +23,7 @@ public class LogFilePort implements SiPort {
 	}
 
 	@Override
-	public SiMessageQueue createMessageQueue() throws TooManyListenersException, IOException {
+	public SiMessageQueue createMessageQueue() throws IOException {
 		return new LogFileCommReader(logFilename).createMessageQueue();
 	}
 

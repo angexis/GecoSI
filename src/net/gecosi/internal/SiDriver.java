@@ -4,7 +4,6 @@
 package net.gecosi.internal;
 
 import java.io.IOException;
-import java.util.TooManyListenersException;
 import java.util.concurrent.TimeoutException;
 
 import jssc.SerialPortException;
@@ -24,7 +23,7 @@ public class SiDriver implements Runnable {
 	private Thread thread;
 	private SiHandler siHandler;
 
-	public SiDriver(SiPort siPort, SiHandler siHandler) throws TooManyListenersException, IOException, SerialPortException {
+	public SiDriver(SiPort siPort, SiHandler siHandler) throws IOException, SerialPortException {
 		this.siPort = siPort;
 		this.messageQueue = siPort.createMessageQueue();
 		this.writer = siPort.createWriter();
