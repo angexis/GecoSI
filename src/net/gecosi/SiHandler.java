@@ -33,6 +33,8 @@ public class SiHandler implements Runnable {
 
 	private Thread thread;
 
+	private String portname;
+
 
 	public SiHandler(SiListener siListener) {
 		this.dataQueue = new ArrayBlockingQueue<SiDataFrame>(5);
@@ -55,6 +57,7 @@ public class SiHandler implements Runnable {
 	}
 
 	public void connect(String portname) {
+		this.portname = portname;
 		try {
 			SerialPort port = new SerialPort(portname);
 			GecoSILogger.open("######");
@@ -75,16 +78,20 @@ public class SiHandler implements Runnable {
 		driver = new SiDriver(new LogFilePort(logFilename), this).start();
 	}
 
-	public void start() {
-		thread = new Thread(this);
+	private void start() {
+		thread = new Thread(this, toString());
 		thread.start();
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ":" + portname;
+	}
 	public Thread stop() {
 		if( driver != null ){
 			driver.interrupt();
 		}
-		if( thread != null ){
+		if( isAlive() ){
 			thread.interrupt();
 		}
 		return thread;

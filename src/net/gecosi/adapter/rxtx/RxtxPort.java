@@ -36,17 +36,17 @@ public class RxtxPort implements SiPort {
 		return messageQueue;
 	}
 	
-        @Override
+	@Override
 	public CommWriter createWriter() throws IOException {
 		return new RxtxCommWriter(port);
 	}
 
-        @Override
+	@Override
 	public void setupHighSpeed() throws SerialPortException {
-		setSpeed(38400);		
+		setSpeed(38400);
 	}
 
-        @Override
+	@Override
 	public void setupLowSpeed() throws SerialPortException {
 		setSpeed(4800);		
 	}
@@ -54,11 +54,13 @@ public class RxtxPort implements SiPort {
 	private void setSpeed(int baudRate) throws SerialPortException  {
 		port.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,  SerialPort.PARITY_NONE);
 	}
-        
-        @Override
+
+	@Override
 	public void close() throws SerialPortException {
-		// TODO: close streams?
 		port.closePort();
 	}
-	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ":" + port.getPortName();
+	}
 }

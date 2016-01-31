@@ -31,11 +31,16 @@ public class SiDriver implements Runnable {
 	}
 
 	public SiDriver start() {
-		thread = new Thread(this);
+		thread = new Thread(this, toString());
 		thread.start();
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ":" + siPort.toString();
+	}
+	
 	public void interrupt() {
 		thread.interrupt();
 	}
@@ -51,16 +56,13 @@ public class SiDriver implements Runnable {
 				siHandler.notifyError(CommStatus.FATAL_ERROR, currentState.status());
 			}
 		} catch (InterruptedException e) {
-			// normal way out
+			// normal way out... the close() function will do the cleaning
 		} catch (Exception e) {
+			siHandler.notifyError(CommStatus.FATAL_ERROR, e.toString());
 			e.printStackTrace();
 			GecoSILogger.error(" #run# " + e.toString());
 		} finally {
-			try {
-				stop();
-			} catch (SerialPortException e) {
-				GecoSILogger.error(" #run# failed to stop" + e.toString());
-			}
+			close();
 		}
 	}
 
@@ -90,9 +92,14 @@ public class SiDriver implements Runnable {
 		return currentState;
 	}
 
-	private void stop() throws SerialPortException {
-		siPort.close();
-		siHandler.notify(CommStatus.OFF);
+	private void close() {
+		try {
+			siPort.close();
+			siHandler.notify(CommStatus.OFF);
+		} catch (SerialPortException e) {
+			siHandler.notifyError(CommStatus.FATAL_ERROR, e.getExceptionType());
+			GecoSILogger.error(" #run# failed to stop" + e.toString());
+		}
 		GecoSILogger.close();
 	}
 

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class SiMessageQueue extends ArrayBlockingQueue<SiMessage> {
 
+	private static final long serialVersionUID = -9172730670098183134L;
 	private long defaultTimeout;
 
 	public SiMessageQueue(int capacity) {
